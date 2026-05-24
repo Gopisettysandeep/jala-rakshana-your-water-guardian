@@ -1,0 +1,13 @@
+{
+  "name": "Jala Rakshana — Save Water Today, Secure Tomorrow",
+  "short_name": "Jala Rakshana",
+  "description": "Multilingual water conservation and rainwater harvesting awareness with AI assistant.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0c2340",
+  "theme_color": "#0c2340",
+  "orientation": "portrait",
+  "icons": [
+    { "src": "/favicon.ico", "sizes": "64x64", "type": "image/x-icon" }
+  ]
+}
