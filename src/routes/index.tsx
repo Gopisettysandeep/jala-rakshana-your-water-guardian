@@ -1,13 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { Droplets, CloudRain, Landmark, MessageCircle, Sparkles, Leaf, Sun, Bell } from "lucide-react";
+import { Droplets, CloudRain, Landmark, MessageCircle, Sparkles, Leaf, Brain, CloudSun, Users, Film, Trophy } from "lucide-react";
 import { useMemo } from "react";
 import { useI18n } from "@/lib/i18n";
+import { useGamification, BADGES } from "@/lib/gamification";
 
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
       { title: "Jala Rakshana — Home" },
-      { name: "description", content: "Daily water tips, conservation modules, AI assistant — all in your language." },
+      { name: "description", content: "Daily water tips, conservation modules, weather, quiz, community and AI assistant — all in your language." },
     ],
   }),
   component: Home,
@@ -15,6 +16,7 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const { t } = useI18n();
+  const { points, badges } = useGamification();
   const tipKey = useMemo(() => {
     const day = new Date().getDate();
     return `tip_${(day % 5) + 1}`;
@@ -25,11 +27,14 @@ function Home() {
     { to: "/harvest", icon: CloudRain, title: t("harvest_title"), sub: t("harvest_sub"), tint: "bg-eco" },
     { to: "/schemes", icon: Landmark, title: t("schemes_title"), sub: t("schemes_sub"), tint: "bg-hero" },
     { to: "/assistant", icon: MessageCircle, title: t("assistant_title"), sub: t("assistant_sub"), tint: "bg-eco" },
+    { to: "/weather", icon: CloudSun, title: "Weather & Rain", sub: "Local forecast + water tips", tint: "bg-hero" },
+    { to: "/quiz", icon: Brain, title: "Water Quiz", sub: "Earn eco-points & badges", tint: "bg-eco" },
+    { to: "/community", icon: Users, title: "Community", sub: "Make a pledge", tint: "bg-hero" },
+    { to: "/media", icon: Film, title: "Media Library", sub: "Videos & guides", tint: "bg-eco" },
   ];
 
   return (
     <div className="relative">
-      {/* Hero header */}
       <header className="relative overflow-hidden bg-hero text-primary-foreground rounded-b-[2.5rem] px-5 pt-[max(1.5rem,env(safe-area-inset-top))] pb-8 shadow-glow">
         <div className="absolute -top-10 -right-8 size-40 rounded-full bg-white/10 blur-2xl" />
         <div className="absolute -bottom-12 -left-6 size-44 rounded-full bg-white/10 blur-2xl" />
@@ -54,6 +59,31 @@ function Home() {
       </header>
 
       <main className="px-4 pt-6 space-y-6">
+        <Link to="/quiz" className="block glass rounded-3xl p-4 active:scale-[0.99] transition-transform">
+          <div className="flex items-center gap-3">
+            <div className="grid place-items-center size-11 rounded-2xl bg-eco text-primary-foreground shadow-soft">
+              <Trophy className="size-5" />
+            </div>
+            <div className="flex-1">
+              <p className="text-xs text-muted-foreground">Your progress</p>
+              <p className="font-semibold">{points} eco-points · {badges.length}/{BADGES.length} badges</p>
+            </div>
+            <div className="flex -space-x-1">
+              {BADGES.slice(0, 5).map((b) => (
+                <span
+                  key={b.id}
+                  className={`size-7 grid place-items-center rounded-full text-sm border-2 border-background ${
+                    badges.includes(b.id) ? "bg-[color:var(--leaf)]/20" : "bg-muted/40 opacity-60"
+                  }`}
+                  title={b.name}
+                >
+                  {b.emoji}
+                </span>
+              ))}
+            </div>
+          </div>
+        </Link>
+
         <section>
           <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider px-1 mb-3">
             {t("explore")}
@@ -82,20 +112,6 @@ function Home() {
             <span>Quote of the day</span>
           </div>
           <p className="mt-2 text-sm italic text-foreground/80 leading-relaxed">"{t("quote")}"</p>
-        </section>
-
-        <section className="grid grid-cols-3 gap-3">
-          {[
-            { icon: Droplets, label: "150L", sub: "avg/person/day" },
-            { icon: Sun, label: "3.5°C", sub: "summer rise" },
-            { icon: Bell, label: "21%", sub: "India stressed" },
-          ].map((s) => (
-            <div key={s.sub} className="glass rounded-2xl p-3 text-center">
-              <s.icon className="size-4 mx-auto text-primary" />
-              <p className="mt-1 font-bold text-sm">{s.label}</p>
-              <p className="text-[10px] text-muted-foreground leading-tight">{s.sub}</p>
-            </div>
-          ))}
         </section>
       </main>
     </div>

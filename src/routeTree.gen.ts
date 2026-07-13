@@ -9,13 +9,22 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WeatherRouteImport } from './routes/weather'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as SchemesRouteImport } from './routes/schemes'
+import { Route as QuizRouteImport } from './routes/quiz'
+import { Route as MediaRouteImport } from './routes/media'
 import { Route as HarvestRouteImport } from './routes/harvest'
 import { Route as ConservationRouteImport } from './routes/conservation'
+import { Route as CommunityRouteImport } from './routes/community'
 import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as IndexRouteImport } from './routes/index'
 
+const WeatherRoute = WeatherRouteImport.update({
+  id: '/weather',
+  path: '/weather',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsRoute = SettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -26,6 +35,16 @@ const SchemesRoute = SchemesRouteImport.update({
   path: '/schemes',
   getParentRoute: () => rootRouteImport,
 } as any)
+const QuizRoute = QuizRouteImport.update({
+  id: '/quiz',
+  path: '/quiz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MediaRoute = MediaRouteImport.update({
+  id: '/media',
+  path: '/media',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const HarvestRoute = HarvestRouteImport.update({
   id: '/harvest',
   path: '/harvest',
@@ -34,6 +53,11 @@ const HarvestRoute = HarvestRouteImport.update({
 const ConservationRoute = ConservationRouteImport.update({
   id: '/conservation',
   path: '/conservation',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CommunityRoute = CommunityRouteImport.update({
+  id: '/community',
+  path: '/community',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AssistantRoute = AssistantRouteImport.update({
@@ -50,66 +74,101 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/assistant': typeof AssistantRoute
+  '/community': typeof CommunityRoute
   '/conservation': typeof ConservationRoute
   '/harvest': typeof HarvestRoute
+  '/media': typeof MediaRoute
+  '/quiz': typeof QuizRoute
   '/schemes': typeof SchemesRoute
   '/settings': typeof SettingsRoute
+  '/weather': typeof WeatherRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/assistant': typeof AssistantRoute
+  '/community': typeof CommunityRoute
   '/conservation': typeof ConservationRoute
   '/harvest': typeof HarvestRoute
+  '/media': typeof MediaRoute
+  '/quiz': typeof QuizRoute
   '/schemes': typeof SchemesRoute
   '/settings': typeof SettingsRoute
+  '/weather': typeof WeatherRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/assistant': typeof AssistantRoute
+  '/community': typeof CommunityRoute
   '/conservation': typeof ConservationRoute
   '/harvest': typeof HarvestRoute
+  '/media': typeof MediaRoute
+  '/quiz': typeof QuizRoute
   '/schemes': typeof SchemesRoute
   '/settings': typeof SettingsRoute
+  '/weather': typeof WeatherRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/assistant'
+    | '/community'
     | '/conservation'
     | '/harvest'
+    | '/media'
+    | '/quiz'
     | '/schemes'
     | '/settings'
+    | '/weather'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/assistant'
+    | '/community'
     | '/conservation'
     | '/harvest'
+    | '/media'
+    | '/quiz'
     | '/schemes'
     | '/settings'
+    | '/weather'
   id:
     | '__root__'
     | '/'
     | '/assistant'
+    | '/community'
     | '/conservation'
     | '/harvest'
+    | '/media'
+    | '/quiz'
     | '/schemes'
     | '/settings'
+    | '/weather'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AssistantRoute: typeof AssistantRoute
+  CommunityRoute: typeof CommunityRoute
   ConservationRoute: typeof ConservationRoute
   HarvestRoute: typeof HarvestRoute
+  MediaRoute: typeof MediaRoute
+  QuizRoute: typeof QuizRoute
   SchemesRoute: typeof SchemesRoute
   SettingsRoute: typeof SettingsRoute
+  WeatherRoute: typeof WeatherRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/weather': {
+      id: '/weather'
+      path: '/weather'
+      fullPath: '/weather'
+      preLoaderRoute: typeof WeatherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings': {
       id: '/settings'
       path: '/settings'
@@ -124,6 +183,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SchemesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/quiz': {
+      id: '/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/media': {
+      id: '/media'
+      path: '/media'
+      fullPath: '/media'
+      preLoaderRoute: typeof MediaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/harvest': {
       id: '/harvest'
       path: '/harvest'
@@ -136,6 +209,13 @@ declare module '@tanstack/react-router' {
       path: '/conservation'
       fullPath: '/conservation'
       preLoaderRoute: typeof ConservationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/assistant': {
@@ -158,21 +238,15 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AssistantRoute: AssistantRoute,
+  CommunityRoute: CommunityRoute,
   ConservationRoute: ConservationRoute,
   HarvestRoute: HarvestRoute,
+  MediaRoute: MediaRoute,
+  QuizRoute: QuizRoute,
   SchemesRoute: SchemesRoute,
   SettingsRoute: SettingsRoute,
+  WeatherRoute: WeatherRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
