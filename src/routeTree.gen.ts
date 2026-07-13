@@ -21,34 +21,54 @@ import { Route as AssistantRouteImport } from './routes/assistant'
 import { Route as IndexRouteImport } from './routes/index'
 
 const WeatherRoute = WeatherRouteImport.update({
-  id: '/weather', path: '/weather', getParentRoute: () => rootRouteImport,
+  id: '/weather',
+  path: '/weather',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings', path: '/settings', getParentRoute: () => rootRouteImport,
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const SchemesRoute = SchemesRouteImport.update({
-  id: '/schemes', path: '/schemes', getParentRoute: () => rootRouteImport,
+  id: '/schemes',
+  path: '/schemes',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const QuizRoute = QuizRouteImport.update({
-  id: '/quiz', path: '/quiz', getParentRoute: () => rootRouteImport,
+  id: '/quiz',
+  path: '/quiz',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const MediaRoute = MediaRouteImport.update({
-  id: '/media', path: '/media', getParentRoute: () => rootRouteImport,
+  id: '/media',
+  path: '/media',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const HarvestRoute = HarvestRouteImport.update({
-  id: '/harvest', path: '/harvest', getParentRoute: () => rootRouteImport,
+  id: '/harvest',
+  path: '/harvest',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ConservationRoute = ConservationRouteImport.update({
-  id: '/conservation', path: '/conservation', getParentRoute: () => rootRouteImport,
+  id: '/conservation',
+  path: '/conservation',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const CommunityRoute = CommunityRouteImport.update({
-  id: '/community', path: '/community', getParentRoute: () => rootRouteImport,
+  id: '/community',
+  path: '/community',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const AssistantRoute = AssistantRouteImport.update({
-  id: '/assistant', path: '/assistant', getParentRoute: () => rootRouteImport,
+  id: '/assistant',
+  path: '/assistant',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
-  id: '/', path: '/', getParentRoute: () => rootRouteImport,
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -91,15 +111,40 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
-    | '/' | '/assistant' | '/community' | '/conservation' | '/harvest'
-    | '/media' | '/quiz' | '/schemes' | '/settings' | '/weather'
+    | '/'
+    | '/assistant'
+    | '/community'
+    | '/conservation'
+    | '/harvest'
+    | '/media'
+    | '/quiz'
+    | '/schemes'
+    | '/settings'
+    | '/weather'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/' | '/assistant' | '/community' | '/conservation' | '/harvest'
-    | '/media' | '/quiz' | '/schemes' | '/settings' | '/weather'
+    | '/'
+    | '/assistant'
+    | '/community'
+    | '/conservation'
+    | '/harvest'
+    | '/media'
+    | '/quiz'
+    | '/schemes'
+    | '/settings'
+    | '/weather'
   id:
-    | '__root__' | '/' | '/assistant' | '/community' | '/conservation'
-    | '/harvest' | '/media' | '/quiz' | '/schemes' | '/settings' | '/weather'
+    | '__root__'
+    | '/'
+    | '/assistant'
+    | '/community'
+    | '/conservation'
+    | '/harvest'
+    | '/media'
+    | '/quiz'
+    | '/schemes'
+    | '/settings'
+    | '/weather'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -117,33 +162,91 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/weather': { id: '/weather'; path: '/weather'; fullPath: '/weather'; preLoaderRoute: typeof WeatherRouteImport; parentRoute: typeof rootRouteImport }
-    '/settings': { id: '/settings'; path: '/settings'; fullPath: '/settings'; preLoaderRoute: typeof SettingsRouteImport; parentRoute: typeof rootRouteImport }
-    '/schemes': { id: '/schemes'; path: '/schemes'; fullPath: '/schemes'; preLoaderRoute: typeof SchemesRouteImport; parentRoute: typeof rootRouteImport }
-    '/quiz': { id: '/quiz'; path: '/quiz'; fullPath: '/quiz'; preLoaderRoute: typeof QuizRouteImport; parentRoute: typeof rootRouteImport }
-    '/media': { id: '/media'; path: '/media'; fullPath: '/media'; preLoaderRoute: typeof MediaRouteImport; parentRoute: typeof rootRouteImport }
-    '/harvest': { id: '/harvest'; path: '/harvest'; fullPath: '/harvest'; preLoaderRoute: typeof HarvestRouteImport; parentRoute: typeof rootRouteImport }
-    '/conservation': { id: '/conservation'; path: '/conservation'; fullPath: '/conservation'; preLoaderRoute: typeof ConservationRouteImport; parentRoute: typeof rootRouteImport }
-    '/community': { id: '/community'; path: '/community'; fullPath: '/community'; preLoaderRoute: typeof CommunityRouteImport; parentRoute: typeof rootRouteImport }
-    '/assistant': { id: '/assistant'; path: '/assistant'; fullPath: '/assistant'; preLoaderRoute: typeof AssistantRouteImport; parentRoute: typeof rootRouteImport }
-    '/': { id: '/'; path: '/'; fullPath: '/'; preLoaderRoute: typeof IndexRouteImport; parentRoute: typeof rootRouteImport }
+    '/weather': {
+      id: '/weather'
+      path: '/weather'
+      fullPath: '/weather'
+      preLoaderRoute: typeof WeatherRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/schemes': {
+      id: '/schemes'
+      path: '/schemes'
+      fullPath: '/schemes'
+      preLoaderRoute: typeof SchemesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/quiz': {
+      id: '/quiz'
+      path: '/quiz'
+      fullPath: '/quiz'
+      preLoaderRoute: typeof QuizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/media': {
+      id: '/media'
+      path: '/media'
+      fullPath: '/media'
+      preLoaderRoute: typeof MediaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/harvest': {
+      id: '/harvest'
+      path: '/harvest'
+      fullPath: '/harvest'
+      preLoaderRoute: typeof HarvestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/conservation': {
+      id: '/conservation'
+      path: '/conservation'
+      fullPath: '/conservation'
+      preLoaderRoute: typeof ConservationRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/community': {
+      id: '/community'
+      path: '/community'
+      fullPath: '/community'
+      preLoaderRoute: typeof CommunityRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/assistant': {
+      id: '/assistant'
+      path: '/assistant'
+      fullPath: '/assistant'
+      preLoaderRoute: typeof AssistantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute, AssistantRoute, CommunityRoute, ConservationRoute, HarvestRoute,
-  MediaRoute, QuizRoute, SchemesRoute, SettingsRoute, WeatherRoute,
+  IndexRoute: IndexRoute,
+  AssistantRoute: AssistantRoute,
+  CommunityRoute: CommunityRoute,
+  ConservationRoute: ConservationRoute,
+  HarvestRoute: HarvestRoute,
+  MediaRoute: MediaRoute,
+  QuizRoute: QuizRoute,
+  SchemesRoute: SchemesRoute,
+  SettingsRoute: SettingsRoute,
+  WeatherRoute: WeatherRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
