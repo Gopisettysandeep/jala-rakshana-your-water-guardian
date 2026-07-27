@@ -27,7 +27,7 @@ function Home() {
     { to: "/harvest", icon: CloudRain, title: t("harvest_title"), sub: t("harvest_sub"), tint: "bg-eco" },
     { to: "/schemes", icon: Landmark, title: t("schemes_title"), sub: t("schemes_sub"), tint: "bg-hero" },
     { to: "/assistant", icon: MessageCircle, title: t("assistant_title"), sub: t("assistant_sub"), tint: "bg-eco" },
-    { to: "/weather", icon: CloudSun, title: "Weather & Rain", sub: "Local forecast + water tips", tint: "bg-hero" },
+    { to: "/weather", icon: CloudSun, title: "Climate Intelligence", sub: "Live weather, rain & farm advice", tint: "bg-hero" },
     { to: "/quiz", icon: Brain, title: "Water Quiz", sub: "Earn eco-points & badges", tint: "bg-eco" },
     { to: "/community", icon: Users, title: "Community", sub: "Make a pledge", tint: "bg-hero" },
     { to: "/media", icon: Film, title: "Media Library", sub: "Videos & guides", tint: "bg-eco" },

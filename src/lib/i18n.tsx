@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { LANGUAGES, RTL_LANGS, TRANSLATIONS, type LangCode } from "./translations";
+import { CLIMATE_TRANSLATIONS } from "./climate-translations";
+
 
 type FontSize = "small" | "medium" | "large";
 type Theme = "light" | "dark";
@@ -59,11 +61,12 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [settings, hydrated]);
 
   const value = useMemo<Ctx>(() => {
-    const dict = TRANSLATIONS[settings.lang] ?? TRANSLATIONS.en;
-    const fallback = TRANSLATIONS.en;
+    const dict = { ...(TRANSLATIONS[settings.lang] ?? TRANSLATIONS.en), ...(CLIMATE_TRANSLATIONS[settings.lang] ?? {}) };
+    const fallback = { ...TRANSLATIONS.en, ...CLIMATE_TRANSLATIONS.en };
     return {
       ...settings,
       t: (k) => dict[k] ?? fallback[k] ?? k,
+
       setLang: (lang) => setSettings((s) => ({ ...s, lang })),
       setTheme: (theme) => setSettings((s) => ({ ...s, theme })),
       setFontSize: (fontSize) => setSettings((s) => ({ ...s, fontSize })),
