@@ -1,5 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { LANGUAGES, RTL_LANGS, TRANSLATIONS, type LangCode } from "./translations";
+import { CLIMATE_TRANSLATIONS } from "./climate-translations";
+
 
 type FontSize = "small" | "medium" | "large";
 type Theme = "light" | "dark";
