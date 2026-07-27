@@ -1,171 +1,269 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { CloudSun, MapPin, Droplet, Wind, Thermometer, RefreshCw } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useServerFn } from "@tanstack/react-start";
+import { CloudSun, RefreshCw, WifiOff } from "lucide-react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
+import { useI18n } from "@/lib/i18n";
+import { LANG_NAMES_FOR_AI } from "@/lib/translations";
+import { LocationBar } from "@/components/climate/LocationBar";
+import {
+  AdvisorPanel, FarmPanel, MapsPanel, NowPanel, RainPanel, TrendsPanel,
+} from "@/components/climate/panels";
+import { getClimateAdvice, type ClimateAdvice } from "@/lib/climate.functions";
+import {
+  deriveAlerts, fetchClimate, readCache, readPlaces, reverseName, REFRESH_MS, ROOF_KEY,
+  writeCache, writePlaces, type ClimateSnapshot, type GeoPlace,
+} from "@/lib/climate";
 
 export const Route = createFileRoute("/weather")({
   head: () => ({
     meta: [
-      { title: "Weather & Rain — Jala Rakshana" },
-      { name: "description", content: "Live local weather, rainfall and water-saving guidance based on today's conditions." },
+      { title: "Climate Intelligence — Jala Rakshana" },
+      {
+        name: "description",
+        content:
+          "Live weather, rainfall monitoring, climate risk alerts, smart agriculture advisories and rainwater harvesting guidance for your location.",
+      },
+      { property: "og:title", content: "Climate Intelligence — Jala Rakshana" },
+      {
+        property: "og:description",
+        content: "Real-time weather, rainfall trends and AI water & farming advisories in 9 Indian languages.",
+      },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
   }),
-  component: WeatherPage,
+  component: ClimatePage,
 });
 
-interface Current {
-  temperature_2m: number;
-  relative_humidity_2m: number;
-  wind_speed_10m: number;
-  precipitation: number;
-  weather_code: number;
-}
-interface Daily {
-  time: string[];
-  precipitation_sum: number[];
-  temperature_2m_max: number[];
-  temperature_2m_min: number[];
-  weather_code: number[];
-}
+const TABS = [
+  { id: "now", key: "tab_now" },
+  { id: "rain", key: "tab_rain" },
+  { id: "advisor", key: "tab_advisor" },
+  { id: "farm", key: "tab_farm" },
+  { id: "maps", key: "tab_maps" },
+  { id: "trends", key: "tab_trends" },
+] as const;
 
-const CODE_MAP: Record<number, string> = {
-  0: "Clear sky", 1: "Mostly clear", 2: "Partly cloudy", 3: "Overcast",
-  45: "Foggy", 48: "Rime fog",
-  51: "Light drizzle", 53: "Drizzle", 55: "Heavy drizzle",
-  61: "Light rain", 63: "Rain", 65: "Heavy rain",
-  71: "Light snow", 73: "Snow", 75: "Heavy snow",
-  80: "Rain showers", 81: "Heavy showers", 82: "Violent showers",
-  95: "Thunderstorm", 96: "Thunder w/ hail", 99: "Thunder w/ heavy hail",
-};
+const DEFAULT_PLACE: GeoPlace = { id: "default-delhi", name: "New Delhi", admin: "Delhi", country: "India", lat: 28.6139, lon: 77.209 };
 
-function describe(code: number) { return CODE_MAP[code] ?? "Weather"; }
-
-function guidance(current: Current | null, daily: Daily | null) {
-  if (!current || !daily) return "";
-  const rainSoon = daily.precipitation_sum.slice(0, 3).some((v) => v > 2);
-  if (current.precipitation > 0.2) return "It's raining — a perfect moment to set out buckets or check your rooftop harvesting inlet.";
-  if (rainSoon) return "Rain expected in the next 3 days — clean gutters and prepare your harvesting tank now.";
-  if (current.temperature_2m > 34) return "Hot day — water plants at dusk and reuse RO reject water to reduce demand.";
-  return "Dry conditions — turn off idle taps and check for leaks. Every drop counts today.";
+function seasonOf(d = new Date()) {
+  const m = d.getMonth() + 1;
+  if (m <= 2) return "Winter";
+  if (m <= 5) return "Summer / pre-monsoon";
+  if (m <= 9) return "Southwest monsoon";
+  return "Post-monsoon / retreating monsoon";
 }
 
-function WeatherPage() {
+function ClimatePage() {
+  const { t, lang, notifications } = useI18n();
+  const advise = useServerFn(getClimateAdvice);
+
+  const [tab, setTab] = useState<(typeof TABS)[number]["id"]>("now");
+  const [place, setPlace] = useState<GeoPlace | null>(null);
+  const [places, setPlaces] = useState<GeoPlace[]>([]);
+  const [snap, setSnap] = useState<ClimateSnapshot | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [place, setPlace] = useState<string>("");
-  const [current, setCurrent] = useState<Current | null>(null);
-  const [daily, setDaily] = useState<Daily | null>(null);
+  const [offline, setOffline] = useState(false);
+  const [roofArea, setRoofArea] = useState(100);
+  const [advice, setAdvice] = useState<ClimateAdvice | null>(null);
+  const [adviceLoading, setAdviceLoading] = useState(false);
+  const [layer, setLayer] = useState("rain");
+  const notified = useRef<string>("");
 
-  async function loadFor(lat: number, lon: number, label?: string) {
-    setLoading(true); setError(null);
+  // hydrate from storage
+  useEffect(() => {
+    setPlaces(readPlaces());
+    const roof = Number(localStorage.getItem(ROOF_KEY));
+    if (roof > 0) setRoofArea(roof);
+    const cached = readCache();
+    if (cached) {
+      setSnap(cached);
+      setPlace(cached.place);
+      setOffline(true);
+    } else {
+      detect();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    try { localStorage.setItem(ROOF_KEY, String(roofArea)); } catch { /* ignore */ }
+  }, [roofArea]);
+
+  const load = useCallback(async (p: GeoPlace) => {
+    setLoading(true);
+    setError(null);
     try {
-      const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,precipitation,weather_code,wind_speed_10m&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_sum&timezone=auto&forecast_days=5`;
-      const res = await fetch(url);
-      if (!res.ok) throw new Error("weather fetch failed");
-      const json = await res.json();
-      setCurrent(json.current);
-      setDaily(json.daily);
-      if (label) setPlace(label);
-      else setPlace(`${lat.toFixed(2)}°, ${lon.toFixed(2)}°`);
+      const s = await fetchClimate(p);
+      setSnap(s);
+      setOffline(false);
+      writeCache(s);
+      setAdvice(null);
     } catch {
-      setError("Couldn't load weather. Check your connection and try again.");
+      setError(t("offline_data"));
+      setOffline(true);
     } finally {
       setLoading(false);
     }
-  }
+  }, [t]);
 
-  function detectLocation() {
+  const pick = useCallback((p: GeoPlace) => {
+    setPlace(p);
+    load(p);
+  }, [load]);
+
+  function detect() {
     if (!("geolocation" in navigator)) {
-      setError("Geolocation not supported on this device.");
+      pick(DEFAULT_PLACE);
       return;
     }
     setLoading(true);
     navigator.geolocation.getCurrentPosition(
-      (pos) => loadFor(pos.coords.latitude, pos.coords.longitude, "Your location"),
-      () => {
-        setError("Location permission denied. Showing Delhi as fallback.");
-        loadFor(28.6139, 77.209, "New Delhi (fallback)");
+      async (pos) => {
+        const { latitude: lat, longitude: lon } = pos.coords;
+        const name = await reverseName(lat, lon);
+        pick({ id: `geo-${lat.toFixed(3)}-${lon.toFixed(3)}`, name, lat, lon });
       },
+      () => pick(DEFAULT_PLACE),
       { timeout: 8000 },
     );
   }
 
-  useEffect(() => { detectLocation(); /* eslint-disable-next-line */ }, []);
+  // auto refresh every 15 minutes
+  useEffect(() => {
+    if (!place) return;
+    const id = setInterval(() => load(place), REFRESH_MS);
+    return () => clearInterval(id);
+  }, [place, load]);
+
+  const alerts = snap ? deriveAlerts(snap) : [];
+
+  // Browser notification for high-severity alerts (if enabled in settings)
+  useEffect(() => {
+    if (!notifications || typeof Notification === "undefined" || !snap) return;
+    const high = alerts.filter((a) => a.severity === "high");
+    if (high.length === 0) return;
+    const sig = `${snap.place.id}:${high.map((h) => h.id).join(",")}`;
+    if (notified.current === sig) return;
+    notified.current = sig;
+    const fire = () =>
+      high.forEach((h) =>
+        new Notification(`Jala Rakshana — ${h.title}`, { body: h.detail, icon: "/favicon.ico" }),
+      );
+    if (Notification.permission === "granted") fire();
+    else if (Notification.permission === "default") Notification.requestPermission().then((p) => p === "granted" && fire());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [snap, notifications]);
+
+  async function generateAdvice() {
+    if (!snap) return;
+    setAdviceLoading(true);
+    try {
+      const res = await advise({
+        data: {
+          languageName: LANG_NAMES_FOR_AI[lang],
+          place: `${snap.place.name}${snap.place.admin ? ", " + snap.place.admin : ""}`,
+          season: seasonOf(),
+          temperature: Math.round(snap.current.temperature),
+          humidity: Math.round(snap.current.humidity),
+          rainToday: Number(snap.daily.precipitation_sum[0] ?? 0),
+          rainWeek: Number(snap.daily.precipitation_sum.slice(0, 7).reduce((a, b) => a + b, 0).toFixed(1)),
+          windSpeed: Math.round(snap.current.windSpeed),
+          uv: Number(snap.current.uv.toFixed(1)),
+          aqi: snap.air.aqi,
+          alerts: alerts.map((a) => `${a.title}: ${a.detail}`),
+          roofArea,
+        },
+      });
+      if (res.ok) setAdvice(res.advice);
+      else setError(t(res.error === "rate_limited" ? "rate_limited" : res.error === "no_credits" ? "no_credits" : "error_generic"));
+    } catch {
+      setError(t("error_generic"));
+    } finally {
+      setAdviceLoading(false);
+    }
+  }
+
+  function savePlace() {
+    if (!place) return;
+    const exists = places.some((p) => p.id === place.id);
+    const next = exists ? places.filter((p) => p.id !== place.id) : [...places, place].slice(-8);
+    setPlaces(next);
+    writePlaces(next);
+  }
+
+  function removePlace(id: string) {
+    const next = places.filter((p) => p.id !== id);
+    setPlaces(next);
+    writePlaces(next);
+  }
 
   return (
     <div>
-      <PageHeader title="Weather & Rain" subtitle={place || "Detecting location…"} icon={CloudSun} />
-      <main className="px-4 py-5 space-y-4">
-        <div className="flex gap-2">
+      <PageHeader
+        title={t("climate_title")}
+        subtitle={place ? `${place.name}${place.admin ? ", " + place.admin : ""}` : t("detecting")}
+        icon={CloudSun}
+      />
+      <main className="px-4 py-4 space-y-4">
+        <LocationBar
+          place={place}
+          places={places}
+          onPick={pick}
+          onDetect={detect}
+          onSave={savePlace}
+          onRemove={removePlace}
+        />
+
+        <div className="flex items-center justify-between text-[11px] text-muted-foreground">
+          <span className="inline-flex items-center gap-1">
+            {offline && <WifiOff className="size-3" />}
+            {snap
+              ? `${offline ? t("offline_data") : t("last_updated")} · ${new Date(snap.fetchedAt).toLocaleTimeString()}`
+              : t("loading")}
+          </span>
           <button
-            onClick={detectLocation}
-            className="flex-1 inline-flex items-center justify-center gap-2 rounded-2xl bg-hero text-primary-foreground py-2 text-sm font-medium shadow-glow"
+            onClick={() => place && load(place)}
+            className="inline-flex items-center gap-1 rounded-full bg-secondary px-3 py-1 text-secondary-foreground"
           >
-            <MapPin className="size-4" /> Use my location
-          </button>
-          <button
-            onClick={() => current && place && detectLocation()}
-            className="inline-flex items-center justify-center rounded-2xl bg-secondary text-secondary-foreground px-3 py-2 text-sm"
-            aria-label="Refresh"
-          >
-            <RefreshCw className={`size-4 ${loading ? "animate-spin" : ""}`} />
+            <RefreshCw className={`size-3 ${loading ? "animate-spin" : ""}`} /> {t("refresh")}
           </button>
         </div>
 
         {error && <p className="text-xs text-destructive">{error}</p>}
 
-        {current && (
-          <section className="glass rounded-3xl p-5">
-            <p className="text-xs text-muted-foreground">Now — {describe(current.weather_code)}</p>
-            <div className="mt-1 flex items-baseline gap-2">
-              <span className="text-4xl font-bold">{Math.round(current.temperature_2m)}°</span>
-              <span className="text-sm text-muted-foreground">C</span>
-            </div>
-            <div className="mt-4 grid grid-cols-3 gap-2 text-center">
-              <Metric icon={Droplet} label="Humidity" value={`${Math.round(current.relative_humidity_2m)}%`} />
-              <Metric icon={Wind} label="Wind" value={`${Math.round(current.wind_speed_10m)} km/h`} />
-              <Metric icon={Thermometer} label="Rain now" value={`${current.precipitation} mm`} />
-            </div>
-          </section>
-        )}
+        <div className="flex gap-2 overflow-x-auto pb-1">
+          {TABS.map((tb) => (
+            <button
+              key={tb.id}
+              onClick={() => setTab(tb.id)}
+              className={`rounded-full px-3.5 py-1.5 text-xs font-medium shrink-0 transition ${
+                tab === tb.id ? "bg-hero text-primary-foreground shadow-glow" : "bg-secondary text-secondary-foreground"
+              }`}
+            >
+              {t(tb.key)}
+            </button>
+          ))}
+        </div>
 
-        {daily && (
-          <section className="glass rounded-3xl p-5">
-            <h3 className="text-sm font-semibold mb-3">Next 5 days</h3>
-            <div className="space-y-2">
-              {daily.time.slice(0, 5).map((d, idx) => (
-                <div key={d} className="flex items-center justify-between text-sm">
-                  <span className="w-16 text-muted-foreground">
-                    {idx === 0 ? "Today" : new Date(d).toLocaleDateString(undefined, { weekday: "short" })}
-                  </span>
-                  <span className="flex-1 truncate px-2">{describe(daily.weather_code[idx])}</span>
-                  <span className="text-xs text-muted-foreground w-14 text-right">{daily.precipitation_sum[idx]} mm</span>
-                  <span className="w-16 text-right font-medium">
-                    {Math.round(daily.temperature_2m_min[idx])}° / {Math.round(daily.temperature_2m_max[idx])}°
-                  </span>
-                </div>
-              ))}
-            </div>
-          </section>
-        )}
-
-        {current && (
-          <section className="glass rounded-3xl p-5">
-            <h3 className="text-sm font-semibold">Water guidance</h3>
-            <p className="mt-2 text-sm text-foreground/80 leading-relaxed">{guidance(current, daily)}</p>
-          </section>
+        {!snap ? (
+          <p className="text-sm text-muted-foreground">{t("loading")}</p>
+        ) : tab === "now" ? (
+          <NowPanel s={snap} alerts={alerts} />
+        ) : tab === "rain" ? (
+          <RainPanel s={snap} roofArea={roofArea} setRoofArea={setRoofArea} />
+        ) : tab === "advisor" ? (
+          <AdvisorPanel advice={advice} loading={adviceLoading} onGenerate={generateAdvice} alerts={alerts} />
+        ) : tab === "farm" ? (
+          <FarmPanel s={snap} advice={advice} loading={adviceLoading} onGenerate={generateAdvice} />
+        ) : tab === "maps" ? (
+          <MapsPanel s={snap} layer={layer} setLayer={setLayer} />
+        ) : (
+          <TrendsPanel s={snap} />
         )}
       </main>
-    </div>
-  );
-}
-
-function Metric({ icon: Icon, label, value }: { icon: any; label: string; value: string }) {
-  return (
-    <div className="rounded-2xl bg-secondary/60 p-3">
-      <Icon className="size-4 mx-auto text-primary" />
-      <p className="mt-1 text-sm font-semibold">{value}</p>
-      <p className="text-[10px] text-muted-foreground">{label}</p>
     </div>
   );
 }
