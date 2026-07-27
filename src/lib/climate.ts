@@ -171,13 +171,13 @@ export async function searchPlaces(q: string): Promise<GeoPlace[]> {
 
 export async function reverseName(lat: number, lon: number): Promise<string> {
   try {
-    const data = await json<{ results?: Array<{ name: string; admin1?: string }> }>(
-      `https://geocoding-api.open-meteo.com/v1/search?latitude=${lat}&longitude=${lon}&count=1&language=en&format=json`,
+    const data = await json<{ city?: string; locality?: string; principalSubdivision?: string }>(
+      `https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=${lat}&longitude=${lon}&localityLanguage=en`,
     );
-    const r = data.results?.[0];
-    return r ? `${r.name}${r.admin1 ? ", " + r.admin1 : ""}` : `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
+    const name = data.city || data.locality;
+    return name ? `${name}${data.principalSubdivision ? ", " + data.principalSubdivision : ""}` : `${lat.toFixed(2)}\u00b0, ${lon.toFixed(2)}\u00b0`;
   } catch {
-    return `${lat.toFixed(2)}°, ${lon.toFixed(2)}°`;
+    return `${lat.toFixed(2)}\u00b0, ${lon.toFixed(2)}\u00b0`;
   }
 }
 
