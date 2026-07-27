@@ -178,17 +178,11 @@ export function RainPanel({
       <Card title={t("hourly_forecast")}>
         <ResponsiveContainer width="100%" height={170}>
           <AreaChart data={hourly}>
-            <defs>
-              <linearGradient id="rainFill" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="0%" stopColor="var(--primary)" stopOpacity={0.7} />
-                <stop offset="100%" stopColor="var(--primary)" stopOpacity={0.05} />
-              </linearGradient>
-            </defs>
             <CartesianGrid strokeDasharray="3 3" opacity={0.15} />
             <XAxis dataKey="label" tick={{ fontSize: 10 }} interval={3} />
             <YAxis tick={{ fontSize: 10 }} width={28} />
             <Tooltip contentStyle={{ borderRadius: 12, fontSize: 12 }} />
-            <Area type="monotone" dataKey="mm" stroke="var(--primary)" fill="url(#rainFill)" />
+            <Area type="monotone" dataKey="mm" className="fill-primary/25 stroke-primary" strokeWidth={2} />
           </AreaChart>
         </ResponsiveContainer>
         <p className="mt-2 text-[11px] text-muted-foreground">
@@ -203,7 +197,7 @@ export function RainPanel({
             <XAxis dataKey="label" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} width={28} />
             <Tooltip contentStyle={{ borderRadius: 12, fontSize: 12 }} />
-            <Bar dataKey="mm" fill="var(--primary)" radius={[6, 6, 0, 0]} />
+            <Bar dataKey="mm" className="fill-primary" radius={[6, 6, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
         <div className="mt-3 space-y-1.5">
@@ -446,7 +440,7 @@ export function TrendsPanel({ s }: { s: ClimateSnapshot }) {
               <XAxis dataKey="label" tick={{ fontSize: 10 }} />
               <YAxis tick={{ fontSize: 10 }} width={32} />
               <Tooltip contentStyle={{ borderRadius: 12, fontSize: 12 }} />
-              <Bar dataKey="rain" fill="var(--primary)" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="rain" className="fill-primary" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
         ) : (
@@ -464,8 +458,8 @@ export function TrendsPanel({ s }: { s: ClimateSnapshot }) {
             <XAxis dataKey="label" tick={{ fontSize: 10 }} />
             <YAxis tick={{ fontSize: 10 }} width={28} />
             <Tooltip contentStyle={{ borderRadius: 12, fontSize: 12 }} />
-            <Line type="monotone" dataKey="max" stroke="var(--destructive)" dot={false} strokeWidth={2} />
-            <Line type="monotone" dataKey="min" stroke="var(--primary)" dot={false} strokeWidth={2} />
+            <Line type="monotone" dataKey="max" className="stroke-destructive" dot={false} strokeWidth={2} />
+            <Line type="monotone" dataKey="min" className="stroke-primary" dot={false} strokeWidth={2} />
           </LineChart>
         </ResponsiveContainer>
       </Card>
