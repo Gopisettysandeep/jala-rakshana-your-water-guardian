@@ -12,6 +12,7 @@ function Frame({ children }: { children: ReactNode }) {
     <div className="min-h-screen pb-24 max-w-md mx-auto relative">
       {showSplash && <Splash onDone={() => setShowSplash(false)} />}
       {children}
+      <InstallPrompt />
       <BottomNav />
     </div>
   );
