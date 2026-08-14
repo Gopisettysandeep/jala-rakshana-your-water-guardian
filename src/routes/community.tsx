@@ -3,6 +3,7 @@ import { Users, Send, HandHeart } from "lucide-react";
 import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { useGamification } from "@/lib/gamification";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/community")({
   head: () => ({
@@ -23,6 +24,7 @@ const SEED = [
 
 function CommunityPage() {
   const { pledges, addPledge, points } = useGamification();
+  const { t } = useI18n();
   const [text, setText] = useState("");
 
   function submit(e: React.FormEvent) {
@@ -37,16 +39,16 @@ function CommunityPage() {
 
   return (
     <div>
-      <PageHeader title="Community Pledges" subtitle={`+10 points per pledge · Total ${points}`} icon={Users} variant="eco" />
+      <PageHeader title={t("community_title")} subtitle={`${t("pledge_points_note")} ${points}`} icon={Users} variant="eco" />
       <main className="px-4 py-5 space-y-4">
         <form onSubmit={submit} className="glass rounded-3xl p-4">
-          <label className="text-xs text-muted-foreground">Your pledge</label>
+          <label className="text-xs text-muted-foreground">{t("your_pledge")}</label>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
             maxLength={200}
             rows={3}
-            placeholder="I promise to…"
+            placeholder={t("pledge_placeholder")}
             className="mt-1 w-full resize-none rounded-2xl bg-background border border-input px-3 py-2 text-sm outline-none focus:ring-2 focus:ring-ring"
           />
           <button
@@ -54,7 +56,7 @@ function CommunityPage() {
             className="mt-2 inline-flex items-center gap-2 rounded-2xl bg-hero text-primary-foreground px-4 py-2 text-sm font-medium shadow-glow disabled:opacity-50"
             disabled={!text.trim()}
           >
-            <Send className="size-4" /> Post pledge
+            <Send className="size-4" /> {t("post_pledge")}
           </button>
         </form>
 
@@ -65,7 +67,7 @@ function CommunityPage() {
               <div>
                 <p className="text-sm leading-relaxed">{p}</p>
                 <p className="text-[10px] text-muted-foreground mt-1">
-                  {idx < pledges.length ? "You" : "Community member"}
+                  {idx < pledges.length ? t("you") : t("community_member")}
                 </p>
               </div>
             </div>

@@ -1,6 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { PlayCircle, FileText, ExternalLink, Film } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/media")({
   head: () => ({
@@ -26,12 +27,13 @@ const GUIDES = [
 ];
 
 function MediaPage() {
+  const { t } = useI18n();
   return (
     <div>
-      <PageHeader title="Media Library" subtitle="Videos & guides" icon={Film} />
+      <PageHeader title={t("media_title")} subtitle={t("media_sub")} icon={Film} />
       <main className="px-4 py-5 space-y-6">
         <section>
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 px-1">Videos</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 px-1">{t("videos")}</h2>
           <div className="space-y-3">
             {VIDEOS.map((v) => (
               <div key={v.src} className="glass rounded-3xl overflow-hidden">
@@ -55,7 +57,7 @@ function MediaPage() {
         </section>
 
         <section>
-          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 px-1">Guides</h2>
+          <h2 className="text-sm font-semibold uppercase tracking-wider text-muted-foreground mb-3 px-1">{t("guides")}</h2>
           <div className="space-y-2">
             {GUIDES.map((g) => (
               <a
