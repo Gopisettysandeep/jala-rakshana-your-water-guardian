@@ -4,6 +4,7 @@ import { I18nProvider } from "@/lib/i18n";
 import { GamificationProvider } from "@/lib/gamification";
 import { BottomNav } from "./BottomNav";
 import { Splash } from "./Splash";
+import { InstallPrompt } from "./InstallPrompt";
 
 function Frame({ children }: { children: ReactNode }) {
   const [showSplash, setShowSplash] = useState(true);
