@@ -3,6 +3,7 @@ import { Brain, Check, X, RotateCcw, Trophy } from "lucide-react";
 import { useState } from "react";
 import { PageHeader } from "@/components/PageHeader";
 import { useGamification, BADGES } from "@/lib/gamification";
+import { useI18n } from "@/lib/i18n";
 
 export const Route = createFileRoute("/quiz")({
   head: () => ({
@@ -61,6 +62,7 @@ const QUESTIONS: Q[] = [
 
 function QuizPage() {
   const { recordQuiz, points, badges } = useGamification();
+  const { t } = useI18n();
   const [i, setI] = useState(0);
   const [picked, setPicked] = useState<number | null>(null);
   const [score, setScore] = useState(0);
@@ -89,11 +91,11 @@ function QuizPage() {
 
   return (
     <div>
-      <PageHeader title="Water Quiz" subtitle={`Eco-points: ${points}`} icon={Brain} variant="eco" />
+      <PageHeader title={t("quiz_title")} subtitle={`${t("eco_points")}: ${points}`} icon={Brain} variant="eco" />
       <main className="px-4 py-5 space-y-4">
         {!done ? (
           <section className="glass rounded-3xl p-5">
-            <p className="text-xs text-muted-foreground">Question {i + 1} of {QUESTIONS.length}</p>
+            <p className="text-xs text-muted-foreground">{t("question_x_of_y")} {i + 1} {t("of")} {QUESTIONS.length}</p>
             <h2 className="mt-2 font-semibold leading-snug">{q.q}</h2>
             <div className="mt-4 space-y-2">
               {q.options.map((opt, idx) => {
@@ -128,7 +130,7 @@ function QuizPage() {
                   onClick={next}
                   className="mt-3 w-full rounded-2xl bg-hero text-primary-foreground py-2.5 font-medium shadow-glow"
                 >
-                  {i + 1 >= QUESTIONS.length ? "Finish" : "Next"}
+                  {i + 1 >= QUESTIONS.length ? t("finish") : t("next")}
                 </button>
               </div>
             )}
@@ -136,19 +138,19 @@ function QuizPage() {
         ) : (
           <section className="glass rounded-3xl p-6 text-center">
             <Trophy className="size-10 mx-auto text-[color:var(--leaf)]" />
-            <h2 className="mt-3 text-xl font-bold">You scored {score} / {QUESTIONS.length}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">+{score * 5} eco-points added.</p>
+            <h2 className="mt-3 text-xl font-bold">{t("you_scored")} {score} / {QUESTIONS.length}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">+{score * 5} {t("points_added")}</p>
             <button
               onClick={restart}
               className="mt-4 inline-flex items-center gap-2 rounded-2xl bg-hero text-primary-foreground px-4 py-2 text-sm font-medium shadow-glow"
             >
-              <RotateCcw className="size-4" /> Try again
+              <RotateCcw className="size-4" /> {t("try_again")}
             </button>
           </section>
         )}
 
         <section className="glass rounded-3xl p-5">
-          <h3 className="text-sm font-semibold">Your badges</h3>
+          <h3 className="text-sm font-semibold">{t("your_badges")}</h3>
           <div className="mt-3 grid grid-cols-5 gap-2">
             {BADGES.map((b) => {
               const owned = badges.includes(b.id);

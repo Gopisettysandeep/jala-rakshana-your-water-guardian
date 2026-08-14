@@ -27,10 +27,10 @@ function Home() {
     { to: "/harvest", icon: CloudRain, title: t("harvest_title"), sub: t("harvest_sub"), tint: "bg-eco" },
     { to: "/schemes", icon: Landmark, title: t("schemes_title"), sub: t("schemes_sub"), tint: "bg-hero" },
     { to: "/assistant", icon: MessageCircle, title: t("assistant_title"), sub: t("assistant_sub"), tint: "bg-eco" },
-    { to: "/weather", icon: CloudSun, title: "Climate Intelligence", sub: "Live weather, rain & farm advice", tint: "bg-hero" },
-    { to: "/quiz", icon: Brain, title: "Water Quiz", sub: "Earn eco-points & badges", tint: "bg-eco" },
-    { to: "/community", icon: Users, title: "Community", sub: "Make a pledge", tint: "bg-hero" },
-    { to: "/media", icon: Film, title: "Media Library", sub: "Videos & guides", tint: "bg-eco" },
+    { to: "/weather", icon: CloudSun, title: t("climate_title"), sub: t("climate_sub"), tint: "bg-hero" },
+    { to: "/quiz", icon: Brain, title: t("quiz_title"), sub: t("quiz_sub"), tint: "bg-eco" },
+    { to: "/community", icon: Users, title: t("community_title"), sub: t("community_sub"), tint: "bg-hero" },
+    { to: "/media", icon: Film, title: t("media_title"), sub: t("media_sub"), tint: "bg-eco" },
   ];
 
   return (
@@ -65,8 +65,8 @@ function Home() {
               <Trophy className="size-5" />
             </div>
             <div className="flex-1">
-              <p className="text-xs text-muted-foreground">Your progress</p>
-              <p className="font-semibold">{points} eco-points · {badges.length}/{BADGES.length} badges</p>
+              <p className="text-xs text-muted-foreground">{t("your_progress")}</p>
+              <p className="font-semibold">{points} {t("eco_points")} · {badges.length}/{BADGES.length} {t("badges")}</p>
             </div>
             <div className="flex -space-x-1">
               {BADGES.slice(0, 5).map((b) => (
@@ -109,7 +109,7 @@ function Home() {
         <section className="glass rounded-3xl p-5">
           <div className="flex items-center gap-2 text-sm font-semibold">
             <Leaf className="size-4 text-[color:var(--leaf)]" />
-            <span>Quote of the day</span>
+            <span>{t("quote_of_day")}</span>
           </div>
           <p className="mt-2 text-sm italic text-foreground/80 leading-relaxed">"{t("quote")}"</p>
         </section>
