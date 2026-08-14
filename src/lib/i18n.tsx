@@ -1,6 +1,7 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { LANGUAGES, RTL_LANGS, TRANSLATIONS, type LangCode } from "./translations";
 import { CLIMATE_TRANSLATIONS } from "./climate-translations";
+import { UI_TRANSLATIONS } from "./ui-translations";
 
 
 type FontSize = "small" | "medium" | "large";
