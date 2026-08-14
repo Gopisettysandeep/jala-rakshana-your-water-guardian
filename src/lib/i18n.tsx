@@ -62,8 +62,12 @@ export function I18nProvider({ children }: { children: ReactNode }) {
   }, [settings, hydrated]);
 
   const value = useMemo<Ctx>(() => {
-    const dict = { ...(TRANSLATIONS[settings.lang] ?? TRANSLATIONS.en), ...(CLIMATE_TRANSLATIONS[settings.lang] ?? {}) };
-    const fallback = { ...TRANSLATIONS.en, ...CLIMATE_TRANSLATIONS.en };
+    const dict = {
+      ...(TRANSLATIONS[settings.lang] ?? TRANSLATIONS.en),
+      ...(CLIMATE_TRANSLATIONS[settings.lang] ?? {}),
+      ...(UI_TRANSLATIONS[settings.lang] ?? {}),
+    };
+    const fallback = { ...TRANSLATIONS.en, ...CLIMATE_TRANSLATIONS.en, ...UI_TRANSLATIONS.en };
     return {
       ...settings,
       t: (k) => dict[k] ?? fallback[k] ?? k,
