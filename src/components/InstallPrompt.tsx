@@ -14,10 +14,7 @@ export function InstallPrompt() {
   const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
-    // Register the offline service worker
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
-    }
+    registerOfflineSupport();
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BIPEvent);
