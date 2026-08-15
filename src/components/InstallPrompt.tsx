@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Download, X } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { registerOfflineSupport } from "@/lib/register-sw";
 
 interface BIPEvent extends Event {
   prompt: () => Promise<void>;
@@ -13,10 +14,7 @@ export function InstallPrompt() {
   const [hidden, setHidden] = useState(false);
 
   useEffect(() => {
-    // Register the offline service worker
-    if ("serviceWorker" in navigator) {
-      navigator.serviceWorker.register("/sw.js").catch(() => {});
-    }
+    registerOfflineSupport();
     const onPrompt = (e: Event) => {
       e.preventDefault();
       setDeferred(e as BIPEvent);
