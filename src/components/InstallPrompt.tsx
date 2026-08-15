@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Download, X } from "lucide-react";
 import { useI18n } from "@/lib/i18n";
+import { registerOfflineSupport } from "@/lib/register-sw";
 
 interface BIPEvent extends Event {
   prompt: () => Promise<void>;
